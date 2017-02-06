@@ -1,6 +1,6 @@
 ﻿{
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
     "_artifactsLocation": {
       "type": "string",
@@ -11,18 +11,18 @@
     },
     "DeployForestTemplateFolder": {
       "type": "string",
-      "defaultvalue": "master",
+      "defaultValue": "master",
       "minLength": 1,
       "metadata": {
-        "description": "template location. This path is relative to the _artifactsLocation parameter"
+        "description": "template location. Use this to select a branch."
       }
     },
     "DeployForestTemplateFileName": {
       "type": "string",
-      "defaultvalue": "azuredeploy.json",
+      "defaultValue": "azuredeploy.json",
       "minLength": 1,
       "metadata": {
-        "description": "Name of the nested template file"
+        "description": "Name of the deployment file."
       }
     },
     "adminUsername": {
@@ -57,7 +57,7 @@
             "adminUsername": "[parameters('adminUserName')]",
             "adminPassword": "[parameters('adminPassword')]",
             "domainName": "fabrikam.com",
-            "childDomainname":  "factory"
+            "childDomainname": "factory"
           }
         }
       }
