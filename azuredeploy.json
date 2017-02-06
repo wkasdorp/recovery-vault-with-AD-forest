@@ -50,16 +50,16 @@
   "variables": {
     "skuTier": "standard",
     "policyName": "dcBackup",
-    "scheduleRunDays": [ ],
-    "scheduleRunTimes": [ "21:00" ],
+    "scheduleRunDays": null,
+    "scheduleRunTimes": [ "2017-02-06T22:00:00.000Z" ],
     "dailyRetentionDurationCount": 60,
     "weeklyRetentionDurationCount": 0,
-    "daysOfTheWeekForMontlyRetention": [ ],
-    "weeksOfTheMonthForMonthlyRetention": [ ],
+    "daysOfTheWeekForMontlyRetention": null,
+    "weeksOfTheMonthForMonthlyRetention": null,
     "monthlyRetentionDurationCount": 0,
-    "monthsOfYear": [ ],
-    "daysOfTheWeekForYearlyRetention": [ ],
-    "weeksOfTheMonthForYearlyRetention": [ ],
+    "monthsOfYear": null,
+    "daysOfTheWeekForYearlyRetention": null,
+    "weeksOfTheMonthForYearlyRetention": null,
     "yearlyRetentionDurationCount": 0
 
   },
