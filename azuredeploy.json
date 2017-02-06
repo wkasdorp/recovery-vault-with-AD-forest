@@ -1,0 +1,67 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "_artifactsLocation": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/wkasdorp/forest-2-domains",
+      "metadata": {
+        "description": "Master URL to forest deployment template"
+      }
+    },
+    "DeployForestTemplateFolder": {
+      "type": "string",
+      "defaultvalue": "master",
+      "minLength": 1,
+      "metadata": {
+        "description": "template location. This path is relative to the _artifactsLocation parameter"
+      }
+    },
+    "DeployForestTemplateFileName": {
+      "type": "string",
+      "defaultvalue": "azuredeploy.json",
+      "minLength": 1,
+      "metadata": {
+        "description": "Name of the nested template file"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the admin account for the Domain(s)"
+      },
+      "defaultValue": "adAdministrator"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password for the Administrator account of the new VMs and Domain(s)"
+      }
+    }
+  },
+    "variables": {
+    },
+    "resources": [
+      {
+        "name": "DeployForest",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "dependsOn": [ ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+              "uri": "[concat(parameters('_artifactsLocation'), '/', parameters('DeployForestTemplateFolder'), '/', parameters('DeployForestTemplateFileName'))]",
+              "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "adminUsername": "[parameters('adminUserName')]",
+            "adminPassword": "[parameters('adminPassword')]",
+            "domainName": "fabrikam.com",
+            "childDomainname":  "factory"
+          }
+        }
+      }
+    ],
+    "outputs": {
+    }
+}
