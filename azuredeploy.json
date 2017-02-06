@@ -2,6 +2,27 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "vaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Recovery Vault"
+      },
+      "defaultValue": "fabrikamRecovery"
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the admin account for the Domain(s)"
+      },
+      "defaultValue": "adAdministrator"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password for the Administrator account of the new VMs and Domain(s)"
+      }
+    },
+
     "_artifactsLocation": {
       "type": "string",
       "defaultValue": "https://raw.githubusercontent.com/wkasdorp/forest-2-domains",
@@ -19,57 +40,147 @@
     },
     "DeployForestTemplateFileName": {
       "type": "string",
-      "defaultValue": "azuredeploy.json",
+      "defaultValue": "do-nothing.json",
       "minLength": 1,
       "metadata": {
         "description": "Name of the deployment file for the forest."
       }
-    },
-    "adminUsername": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the admin account for the Domain(s)"
-      },
-      "defaultValue": "adAdministrator"
-    },
-    "adminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password for the Administrator account of the new VMs and Domain(s)"
-      }
     }
   },
-    "variables": {
-    },
-    "resources": [
-      {
-        "name": "DeployForest",
-        "type": "Microsoft.Resources/deployments",
-        "apiVersion": "2015-01-01",
-        "dependsOn": [ ],
-        "properties": {
-          "mode": "Incremental",
-          "templateLink": {
-              "uri": "[concat(parameters('_artifactsLocation'), '/', parameters('DeployForestTemplateFolder'), '/', parameters('DeployForestTemplateFileName'))]",
-              "contentVersion": "1.0.0.0"
+  "variables": {
+    "skuTier": "standard",
+    "policyName": "dcBackup",
+    "scheduleRunDays": [ ],
+    "scheduleRunTimes": [ "21:00" ],
+    "dailyRetentionDurationCount": 60,
+    "weeklyRetentionDurationCount": 0,
+    "daysOfTheWeekForMontlyRetention": [ ],
+    "weeksOfTheMonthForMonthlyRetention": [ ],
+    "monthlyRetentionDurationCount": 0,
+    "monthsOfYear": [ ],
+    "daysOfTheWeekForYearlyRetention": [ ],
+    "weeksOfTheMonthForYearlyRetention": [ ],
+    "yearlyRetentionDurationCount": 0
+
+  },
+  "resources": [
+    {
+      "name": "DeployForest",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [ ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', parameters('DeployForestTemplateFolder'), '/', parameters('DeployForestTemplateFileName'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUserName')]"
           },
-          "parameters": {
-            "adminUsername": {
-              "value": "[parameters('adminUserName')]"
-            },
-            "adminPassword": {
-              "value": "[parameters('adminPassword')]"
-            },
-            "domainName": {
-              "value": "fabrikam.com"
-            },
-            "childDomainname": {
-              "value": "factory"
-            }
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainName": {
+            "value": "fabrikam.com"
+          },
+          "childDomainname": {
+            "value": "factory"
           }
         }
       }
-    ],
-    "outputs": {
+    },
+    {
+      "type": "Microsoft.RecoveryServices/vaults",
+      "apiVersion": "2015-11-10",
+      "name": "[parameters('vaultName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "RS0",
+        "tier": "[variables('skuTier')]"
+      },
+      "properties": {
+      }
+    },
+    {
+      "apiVersion": "2015-11-10",
+      "name": "[concat(parameters('vaultName'), '/', variables('policyName'))]",
+      "type": "Microsoft.RecoveryServices/vaults/backupPolicies",
+      "dependsOn": [ "[concat('Microsoft.RecoveryServices/vaults/', parameters('vaultName'))]" ],
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "backupManagementType": "AzureIaasVM",
+        "schedulePolicy": {
+          "scheduleRunFrequency": "Daily",
+          "scheduleRunDays": null,
+          "scheduleRunTimes": "[variables('scheduleRunTimes')]",
+          "schedulePolicyType": "SimpleSchedulePolicy"
+        },
+        "retentionPolicy": {
+          "dailySchedule": {
+            "daysOfTheWeek": "[variables('scheduleRunDays')]",
+            "retentionTimes": "[variables('scheduleRunTimes')]",
+            "retentionDuration": {
+              "count": "[variables('dailyRetentionDurationCount')]",
+              "durationType": "Days"
+            },
+            "weeklySchedule": {
+              "daysOfTheWeek": "[variables('scheduleRunDays')]",
+              "retentionTimes": "[variables('scheduleRunTimes')]",
+              "retentionDuration": {
+                "count": "[variables('weeklyRetentionDurationCount')]",
+                "durationType": "Weeks"
+              }
+            },
+            "monthlySchedule": {
+              "retentionScheduleFormatType": "Weekly",
+              "retentionScheduleDaily": {
+                "daysOfTheMonth": [
+                  {
+                    "date": 1,
+                    "isLast": false
+                  }
+                ]
+              },
+              "retentionScheduleWeekly": {
+                "daysOfTheWeek": "[variables('daysOfTheWeekForMontlyRetention')]",
+                "weeksOfTheMonth": "[variables('weeksOfTheMonthForMonthlyRetention')]"
+              },
+              "retentionTimes": "[variables('scheduleRunTimes')]",
+              "retentionDuration": {
+                "count": "[variables('monthlyRetentionDurationCount')]",
+                "durationType": "Months"
+              }
+            },
+            "yearlySchedule": {
+              "retentionScheduleFormatType": "Weekly",
+              "monthsOfYear": "[variables('monthsOfYear')]",
+              "retentionScheduleDaily": {
+                "daysOfTheMonth": [
+                  {
+                    "date": 1,
+                    "isLast": false
+                  }
+                ]
+              },
+              "retentionScheduleWeekly": {
+                "daysOfTheWeek": "[variables('daysOfTheWeekForYearlyRetention')]",
+                "weeksOfTheMonth": "[variables('weeksOfTheMonthForYearlyRetention')]"
+              },
+              "retentionTimes": "[variables('scheduleRunTimes')]",
+              "retentionDuration": {
+                "count": "[variables('yearlyRetentionDurationCount')]",
+                "durationType": "Years"
+              }
+            },
+            "retentionPolicyType": "LongTermRetentionPolicy"
+          }
+        }
+      },
+
+      "outputs": {
+      }
     }
+  ]
 }
