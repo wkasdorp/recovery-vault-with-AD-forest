@@ -177,10 +177,10 @@
             "retentionPolicyType": "LongTermRetentionPolicy"
           }
         }
-      },
-
-      "outputs": {
       }
     }
-  ]
+  ],
+
+  "outputs": {
+  }
 }
