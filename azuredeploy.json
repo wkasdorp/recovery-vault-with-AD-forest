@@ -14,7 +14,7 @@
       "defaultValue": "master",
       "minLength": 1,
       "metadata": {
-        "description": "template location. Use this to select a branch."
+        "description": "template location. Use this to select a GITHUB branch."
       }
     },
     "DeployForestTemplateFileName": {
@@ -22,7 +22,7 @@
       "defaultValue": "azuredeploy.json",
       "minLength": 1,
       "metadata": {
-        "description": "Name of the deployment file."
+        "description": "Name of the deployment file for the forest."
       }
     },
     "adminUsername": {
@@ -54,10 +54,18 @@
               "contentVersion": "1.0.0.0"
           },
           "parameters": {
-            "adminUsername": "[parameters('adminUserName')]",
-            "adminPassword": "[parameters('adminPassword')]",
-            "domainName": "fabrikam.com",
-            "childDomainname": "factory"
+            "adminUsername": {
+              "value": "[parameters('adminUserName')]"
+            },
+            "adminPassword": {
+              "value": "[parameters('adminPassword')]"
+            },
+            "domainName": {
+              "value": "fabrikam.com"
+            },
+            "childDomainname": {
+              "value": "factory"
+            }
           }
         }
       }
