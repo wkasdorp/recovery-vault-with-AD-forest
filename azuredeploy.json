@@ -50,7 +50,7 @@
   "variables": {
     "skuTier": "standard",
     "policyName": "dcBackup",
-    "scheduleRunDays": [ "" ],
+    "scheduleRunDays": [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
     "scheduleRunTimes": [ "2017-02-06T22:00:00.000Z" ],
     "dailyRetentionDurationCount": 60,
     "weeklyRetentionDurationCount": 0,
