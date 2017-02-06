@@ -50,18 +50,17 @@
   "variables": {
     "skuTier": "standard",
     "policyName": "dcBackup",
-    "scheduleRunDays": null,
+    "scheduleRunDays": [ "" ],
     "scheduleRunTimes": [ "2017-02-06T22:00:00.000Z" ],
     "dailyRetentionDurationCount": 60,
     "weeklyRetentionDurationCount": 0,
-    "daysOfTheWeekForMontlyRetention": null,
-    "weeksOfTheMonthForMonthlyRetention": null,
+    "daysOfTheWeekForMontlyRetention": [ "" ],
+    "weeksOfTheMonthForMonthlyRetention": [ "" ],
     "monthlyRetentionDurationCount": 0,
-    "monthsOfYear": null,
-    "daysOfTheWeekForYearlyRetention": null,
-    "weeksOfTheMonthForYearlyRetention": null,
+    "monthsOfYear": [""],
+    "daysOfTheWeekForYearlyRetention": [ "" ],
+    "weeksOfTheMonthForYearlyRetention": [ "" ],
     "yearlyRetentionDurationCount": 0
-
   },
   "resources": [
     {
@@ -124,58 +123,58 @@
             "retentionDuration": {
               "count": "[variables('dailyRetentionDurationCount')]",
               "durationType": "Days"
+            }
+          },
+          "weeklySchedule": {
+            "daysOfTheWeek": "[variables('scheduleRunDays')]",
+            "retentionTimes": "[variables('scheduleRunTimes')]",
+            "retentionDuration": {
+              "count": "[variables('weeklyRetentionDurationCount')]",
+              "durationType": "Weeks"
+            }
+          },
+          "monthlySchedule": {
+            "retentionScheduleFormatType": "Weekly",
+            "retentionScheduleDaily": {
+              "daysOfTheMonth": [
+                {
+                  "date": 1,
+                  "isLast": false
+                }
+              ]
             },
-            "weeklySchedule": {
-              "daysOfTheWeek": "[variables('scheduleRunDays')]",
-              "retentionTimes": "[variables('scheduleRunTimes')]",
-              "retentionDuration": {
-                "count": "[variables('weeklyRetentionDurationCount')]",
-                "durationType": "Weeks"
-              }
+            "retentionScheduleWeekly": {
+              "daysOfTheWeek": "[variables('daysOfTheWeekForMontlyRetention')]",
+              "weeksOfTheMonth": "[variables('weeksOfTheMonthForMonthlyRetention')]"
             },
-            "monthlySchedule": {
-              "retentionScheduleFormatType": "Weekly",
-              "retentionScheduleDaily": {
-                "daysOfTheMonth": [
-                  {
-                    "date": 1,
-                    "isLast": false
-                  }
-                ]
-              },
-              "retentionScheduleWeekly": {
-                "daysOfTheWeek": "[variables('daysOfTheWeekForMontlyRetention')]",
-                "weeksOfTheMonth": "[variables('weeksOfTheMonthForMonthlyRetention')]"
-              },
-              "retentionTimes": "[variables('scheduleRunTimes')]",
-              "retentionDuration": {
-                "count": "[variables('monthlyRetentionDurationCount')]",
-                "durationType": "Months"
-              }
+            "retentionTimes": "[variables('scheduleRunTimes')]",
+            "retentionDuration": {
+              "count": "[variables('monthlyRetentionDurationCount')]",
+              "durationType": "Months"
+            }
+          },
+          "yearlySchedule": {
+            "retentionScheduleFormatType": "Weekly",
+            "monthsOfYear": "[variables('monthsOfYear')]",
+            "retentionScheduleDaily": {
+              "daysOfTheMonth": [
+                {
+                  "date": 1,
+                  "isLast": false
+                }
+              ]
             },
-            "yearlySchedule": {
-              "retentionScheduleFormatType": "Weekly",
-              "monthsOfYear": "[variables('monthsOfYear')]",
-              "retentionScheduleDaily": {
-                "daysOfTheMonth": [
-                  {
-                    "date": 1,
-                    "isLast": false
-                  }
-                ]
-              },
-              "retentionScheduleWeekly": {
-                "daysOfTheWeek": "[variables('daysOfTheWeekForYearlyRetention')]",
-                "weeksOfTheMonth": "[variables('weeksOfTheMonthForYearlyRetention')]"
-              },
-              "retentionTimes": "[variables('scheduleRunTimes')]",
-              "retentionDuration": {
-                "count": "[variables('yearlyRetentionDurationCount')]",
-                "durationType": "Years"
-              }
+            "retentionScheduleWeekly": {
+              "daysOfTheWeek": "[variables('daysOfTheWeekForYearlyRetention')]",
+              "weeksOfTheMonth": "[variables('weeksOfTheMonthForYearlyRetention')]"
             },
-            "retentionPolicyType": "LongTermRetentionPolicy"
-          }
+            "retentionTimes": "[variables('scheduleRunTimes')]",
+            "retentionDuration": {
+              "count": "[variables('yearlyRetentionDurationCount')]",
+              "durationType": "Years"
+            }
+          },
+          "retentionPolicyType": "LongTermRetentionPolicy"       
         }
       }
     }
