@@ -43,7 +43,7 @@
     "DeployForestTemplateFileName": {
       "type": "string",
       "defaultValue": "do-nothing.json",
-      "allowdValues": [
+      "allowedValues": [
         "do-nothing.json",
         "azuredeploy.json"
       ],
