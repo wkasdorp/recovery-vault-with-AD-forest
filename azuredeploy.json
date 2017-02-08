@@ -33,26 +33,52 @@
     "DeployForestTemplateFolder": {
       "type": "string",
       "defaultValue": "master",
-      "minLength": 1,
-      "metadata": {
+      "allowedValues": [
+        "master"
+      ],
+      "metadata":  {
         "description": "template location. Use this to select a GITHUB branch."
       }
     },
     "DeployForestTemplateFileName": {
       "type": "string",
       "defaultValue": "do-nothing.json",
-      "minLength": 1,
+      "allowdValues": [
+        "do-nothing.json",
+        "azuredeploy.json"
+      ],
       "metadata": {
         "description": "Name of the deployment file for the forest."
       }
     }
   },
   "variables": {
+    "rootdc1": "dc1",
+    "rootdc2": "dc2",
+    "childdc1": "childdc1",
+    "childdc2": "childdc2",
+
     "skuTier": "standard",
     "policyName": "dcBackup",
     "scheduleRunDays": [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
-    "scheduleRunTimes": [ "2017-02-06T22:00:00.000Z" ],
+    "scheduleRunTimes": [ "2017-01-01T22:00:00.000Z" ],
     "dailyRetentionDurationCount": 60,
+
+    "existingRecoveryServicesVaultName": "[parameters('vaultName')]",
+    "existingProtectionContainers": [
+      "[concat('iaasvmcontainer;iaasvmcontainerv2;', resourcegroup().name, ';', variables('rootdc1'))]",
+      "[concat('iaasvmcontainer;iaasvmcontainerv2;', resourcegroup().name, ';', variables('childdc1'))]"
+    ],
+    "existingProtectableItems": [
+      "[concat('vm;iaasvmcontainerv2;', resourcegroup().name, ';', variables('rootdc1'))]",
+      "[concat('vm;iaasvmcontainerv2;', resourcegroup().name, ';', variables('childdc1'))]"
+    ],
+    "existingSourceResourceIds": [
+      "[resourceId('Microsoft.Compute/virtualMachines/', variables('rootdc1'))]",
+      "[resourceId('Microsoft.Compute/virtualMachines/', variables('childdc1'))]"
+    ],
+    "backupFabric": "Azure",
+    "protectedItemType": "Microsoft.ClassicCompute/virtualMachines"
   },
   "resources": [
     {
@@ -78,6 +104,18 @@
           },
           "childDomainname": {
             "value": "factory"
+          },
+          "RootDC1Name": {
+            "value": "[variables('rootdc1')]"
+          },
+          "RootDC2Name": {
+            "value": "[variables('rootdc2')]"
+          },
+          "ChildDC3Name": {
+            "value": "[variables('childdc1')]"
+          },
+          "ChildDC4Name": {
+            "value": "[variables('childdc2')]"
           }
         }
       }
@@ -120,8 +158,24 @@
           "weeklySchedule": null,
           "monthlySchedule": null,
           "yearlySchedule": null,
-          "retentionPolicyType": "LongTermRetentionPolicy"       
+          "retentionPolicyType": "LongTermRetentionPolicy"
         }
+      }
+    },
+    {
+      "name": "[concat(variables('existingRecoveryServicesVaultName'), '/', variables('backupFabric'), '/', variables('existingProtectionContainers')[copyIndex()], '/', variables('existingProtectableItems')[copyIndex()])]",
+      "apiVersion": "2016-06-01",
+      "location": "[resourceGroup().location]",
+      "dependson": "[concat(parameters('vaultName'), '/', variables('policyName'))]",
+      "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+      "copy": {
+        "name": "protectedItemsCopy",
+        "count": "[length(variables('existingProtectableItems'))]"
+      },
+      "properties": {
+        "protectedItemType": "[variables('protectedItemType')]",
+        "policyId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', variables('existingRecoveryServicesVaultName'), variables('policyName'))]",
+        "sourceResourceId": "[variables('existingSourceResourceIds')[copyIndex()]]"
       }
     }
   ],
