@@ -169,7 +169,7 @@
       "apiVersion": "2016-06-01",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat(parameters('vaultName'), '/', variables('policyName'))]" 
+        "[concat('Microsoft.RecoveryServices/vaults', '/', parameters('vaultName'), '/backupPolicies/', variables('policyName'))]"
       ],
       "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
       "copy": {
