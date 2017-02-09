@@ -44,9 +44,10 @@
     },
     "DeployForestTemplateFolder": {
       "type": "string",
-      "defaultValue": "master",
+      "defaultValue": "v0.9",
       "allowedValues": [
-        "master"
+        "master",
+        "v0.9"
       ],
       "metadata": {
         "description": "template location. Use this to select a GITHUB branch."
