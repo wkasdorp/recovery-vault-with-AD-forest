@@ -9,18 +9,6 @@
       },
       "defaultValue": "fabrikamRecovery"
     },
-    "DailyBackupFrequency": {
-      "type": "string",
-      "metadata": {
-        "description": "How many many times a day should the VM backup run?"
-      },
-      "allowedValues": [
-        "once",
-        "twice",
-        "thrice"
-      ],
-      "defaultValue": "once"
-    },
     "imageSKU": {
       "type": "string",
       "defaultValue": "2012-R2-Datacenter",
@@ -77,6 +65,8 @@
     }
   },
   "variables": {
+    "domainName": "fabrikam.com",
+    "childDomainName": "factory",
     "rootdc1": "root-dc1",
     "rootdc2": "root-dc2",
     "childdc1": "child-dc1",
@@ -88,13 +78,7 @@
     "skuTier": "standard",
     "policyName": "dcBackup",
     "scheduleRunDays": [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
-    "frequencyMap": {
-      "once": [ "2017-01-01T22:00:00.000Z" ],
-      "twice": [ "2017-01-01T10:00:00.000Z", "2017-01-01T22:00:00.000Z" ],
-      "thrice": [ "2017-01-01T06:00:00.000Z", "2017-01-01T14:00:00.000Z", "2017-01-01T22:00:00.000Z" ]
-    },
-
-    "scheduleRunTimes": "[variables('frequencyMap')[parameters('DailyBackupFrequency')]]",
+    "scheduleRunTimes": [ "2017-01-01T22:00:00.000Z" ],
     "dailyRetentionDurationCount": 60,
     "existingRecoveryServicesVaultName": "[parameters('vaultName')]",
     "existingProtectionContainers": [
@@ -178,10 +162,10 @@
             "value": "[parameters('adminPassword')]"
           },
           "domainName": {
-            "value": "fabrikam.com"
+            "value": "[variables('domainName')]"
           },
           "childDomainname": {
-            "value": "factory"
+            "value": "[variables('childDomainName')]"
           },
           "imageSKU": {
             "value": "[parameters('imageSKU')]"
