@@ -9,6 +9,18 @@
       },
       "defaultValue": "fabrikamRecovery"
     },
+    "DailyBackupFrequency": {
+      "type": "string",
+      "metadata": {
+        "description": "How many many times a day should the VM backup run?"
+      },
+      "allowedValues": [
+        "once",
+        "twice",
+        "thrice"
+      ],
+      "defaultValue": "once"
+    },
     "imageSKU": {
       "type": "string",
       "defaultValue": "2012-R2-Datacenter",
@@ -26,7 +38,7 @@
       "metadata": {
         "description": "The name of the admin account for the Domain(s)"
       },
-      "defaultValue": "adAdministrator"
+      "defaultValue": "FabrikamAdmin"
     },
     "adminPassword": {
       "type": "securestring",
@@ -76,9 +88,14 @@
     "skuTier": "standard",
     "policyName": "dcBackup",
     "scheduleRunDays": [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
-    "scheduleRunTimes": [ "2017-01-01T22:00:00.000Z" ],
-    "dailyRetentionDurationCount": 60,
+    "frequencyMap": {
+      "once": [ "2017-01-01T22:00:00.000Z" ],
+      "twice": [ "2017-01-01T10:00:00.000Z", "2017-01-01T22:00:00.000Z" ],
+      "thrice": [ "2017-01-01T06:00:00.000Z", "2017-01-01T14:00:00.000Z", "2017-01-01T22:00:00.000Z" ]
+    },
 
+    "scheduleRunTimes": "[variables('frequencyMap')[parameters('DailyBackupFrequency')]]",
+    "dailyRetentionDurationCount": 60,
     "existingRecoveryServicesVaultName": "[parameters('vaultName')]",
     "existingProtectionContainers": [
       "[concat('iaasvmcontainer;iaasvmcontainerv2;', resourcegroup().name, ';', variables('rootdc1'))]",
