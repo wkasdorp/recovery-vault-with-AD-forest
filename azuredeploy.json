@@ -54,7 +54,7 @@
     },
     "DeployForestTemplateFileName": {
       "type": "string",
-      "defaultValue": "do-nothing.json",
+      "defaultValue": "azuredeploy.json",
       "allowedValues": [
         "do-nothing.json",
         "azuredeploy.json"
@@ -65,11 +65,13 @@
     }
   },
   "variables": {
-    "rootdc1": "dc1",
-    "rootdc2": "dc2",
-    "childdc1": "childdc1",
-    "childdc2": "childdc2",
+    "rootdc1": "root-dc1",
+    "rootdc2": "root-dc2",
+    "childdc1": "child-dc1",
+    "childdc2": "child-dc2",
     "VMSize": "Standard_D1_v2",
+    "storageAccountType": "Standard_LRS",
+    "createSecondDc": "yes",
 
     "skuTier": "standard",
     "policyName": "dcBackup",
@@ -167,8 +169,14 @@
           "imageSKU": {
             "value": "[parameters('imageSKU')]"
           },
+          "storageAccountType": {
+            "value": "[variables('storageAccountType')]"
+          },
           "VMSize": {
             "value": "[variables('VMSize')]"
+          },
+          "createSecondDc": {
+            "value": "[variables('createSecondDc')]"
           },
           "RootDC1Name": {
             "value": "[variables('rootdc1')]"
