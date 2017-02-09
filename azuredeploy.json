@@ -9,6 +9,18 @@
       },
       "defaultValue": "fabrikamRecovery"
     },
+    "imageSKU": {
+      "type": "string",
+      "defaultValue": "2012-R2-Datacenter",
+      "allowedValues": [
+        "2012-Datacenter",
+        "2012-R2-Datacenter",
+        "2016-Datacenter"
+      ],
+      "metadata": {
+        "description": "Windows Server Version."
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -36,7 +48,7 @@
       "allowedValues": [
         "master"
       ],
-      "metadata":  {
+      "metadata": {
         "description": "template location. Use this to select a GITHUB branch."
       }
     },
@@ -57,6 +69,7 @@
     "rootdc2": "dc2",
     "childdc1": "childdc1",
     "childdc2": "childdc2",
+    "VMSize": "Standard_D1_v2",
 
     "skuTier": "standard",
     "policyName": "dcBackup",
@@ -82,45 +95,6 @@
   },
   "resources": [
     {
-      "name": "DeployForest",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [ ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', parameters('DeployForestTemplateFolder'), '/', parameters('DeployForestTemplateFileName'))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "adminUsername": {
-            "value": "[parameters('adminUserName')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "domainName": {
-            "value": "fabrikam.com"
-          },
-          "childDomainname": {
-            "value": "factory"
-          },
-          "RootDC1Name": {
-            "value": "[variables('rootdc1')]"
-          },
-          "RootDC2Name": {
-            "value": "[variables('rootdc2')]"
-          },
-          "ChildDC3Name": {
-            "value": "[variables('childdc1')]"
-          },
-          "ChildDC4Name": {
-            "value": "[variables('childdc2')]"
-          }
-        }
-      }
-    },
-    {
       "type": "Microsoft.RecoveryServices/vaults",
       "apiVersion": "2015-11-10",
       "name": "[parameters('vaultName')]",
@@ -137,7 +111,7 @@
       "name": "[concat(parameters('vaultName'), '/', variables('policyName'))]",
       "type": "Microsoft.RecoveryServices/vaults/backupPolicies",
       "dependsOn": [
-        "[concat('Microsoft.RecoveryServices/vaults/', parameters('vaultName'))]" 
+        "[concat('Microsoft.RecoveryServices/vaults/', parameters('vaultName'))]"
       ],
       "location": "[resourceGroup().location]",
       "properties": {
@@ -165,11 +139,59 @@
       }
     },
     {
+      "name": "DeployForest",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.RecoveryServices/vaults', '/', parameters('vaultName'), '/backupPolicies/', variables('policyName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', parameters('DeployForestTemplateFolder'), '/', parameters('DeployForestTemplateFileName'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUserName')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainName": {
+            "value": "fabrikam.com"
+          },
+          "childDomainname": {
+            "value": "factory"
+          },
+          "imageSKU": {
+            "value": "[parameters('imageSKU')]"
+          },
+          "VMSize": {
+            "value": "[variables('VMSize')]"
+          },
+          "RootDC1Name": {
+            "value": "[variables('rootdc1')]"
+          },
+          "RootDC2Name": {
+            "value": "[variables('rootdc2')]"
+          },
+          "ChildDC3Name": {
+            "value": "[variables('childdc1')]"
+          },
+          "ChildDC4Name": {
+            "value": "[variables('childdc2')]"
+          }
+        }
+      }
+    },
+    {
       "name": "[concat(variables('existingRecoveryServicesVaultName'), '/', variables('backupFabric'), '/', variables('existingProtectionContainers')[copyIndex()], '/', variables('existingProtectableItems')[copyIndex()])]",
       "apiVersion": "2016-06-01",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.RecoveryServices/vaults', '/', parameters('vaultName'), '/backupPolicies/', variables('policyName'))]"
+        "[concat('Microsoft.RecoveryServices/vaults', '/', parameters('vaultName'), '/backupPolicies/', variables('policyName'))]",
+        "Microsoft.Resources/deployments/DeployForest"
       ],
       "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
       "copy": {
