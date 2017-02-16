@@ -44,13 +44,13 @@
     },
     "DeployForestTemplateFolder": {
       "type": "string",
-      "defaultValue": "V0.9",
+      "defaultValue": "1.0-stable",
       "allowedValues": [
         "master",
-        "V0.9"
+        "1.0-stable"
       ],
       "metadata": {
-        "description": "template location. Use this to select a GITHUB branch."
+        "description": "template location. Use this to select a GITHUB branch. V1.0 is stable, master is current."
       }
     },
     "DeployForestTemplateFileName": {
@@ -61,7 +61,7 @@
         "azuredeploy.json"
       ],
       "metadata": {
-        "description": "Name of the deployment file for the forest."
+        "description": "Name of the deployment file for the forest. The do-nothing is helpful for testing without VMs"
       }
     }
   },
