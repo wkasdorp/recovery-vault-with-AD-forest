@@ -57,7 +57,7 @@
     "createForest": {
       "type": "bool",
       "metadata": {
-        "description": "Create a forest? Use 'false' if you only want the Vault."
+        "description": "Create a forest? Use 'false' if you only want the Vault (forest must exist)"
       },
       "defaultValue": true
     }
@@ -70,12 +70,13 @@
     "childdc1": "child-dc1",
     "childdc2": "child-dc2",
     "VMSize": "Standard_D1_v2",
-    "createSecondDc": "yes",
+    "createSecondDc": true,
+    "createChildDomain": true,
 
     "skuTier": "standard",
     "policyName": "dcBackup",
     "scheduleRunDays": [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
-    "scheduleRunTimes": [ "2017-01-01T22:00:00.000Z" ],
+    "scheduleRunTimes": [ "2018-01-01T22:00:00.000Z" ],
     "dailyRetentionDurationCount": 60,
     "existingRecoveryServicesVaultName": "[parameters('vaultName')]",
     "existingProtectionContainers": [
@@ -161,6 +162,9 @@
           },
           "domainName": {
             "value": "[variables('domainName')]"
+          },
+          "createChildDomain": {
+            "value": "[variables('createChildDomain')]"
           },
           "childDomainname": {
             "value": "[variables('childDomainName')]"
