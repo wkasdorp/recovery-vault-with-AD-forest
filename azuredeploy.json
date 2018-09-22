@@ -44,25 +44,22 @@
     },
     "DeployForestTemplateFolder": {
       "type": "string",
-      "defaultValue": "1.0-stable",
+      "defaultValue": "master",
       "allowedValues": [
         "master",
-        "1.0-stable"
+        "1.0-stable",
+        "2.0-stable"
       ],
       "metadata": {
-        "description": "template location. Use this to select a GITHUB branch. V1.0 is stable, master is current."
+        "description": "Template location for the Forest. Use this to select a GITHUB branch. V1.0 is stable, master is current."
       }
     },
-    "DeployForestTemplateFileName": {
-      "type": "string",
-      "defaultValue": "azuredeploy.json",
-      "allowedValues": [
-        "do-nothing.json",
-        "azuredeploy.json"
-      ],
+    "createForest": {
+      "type": "bool",
       "metadata": {
-        "description": "Name of the deployment file for the forest. The do-nothing is helpful for testing without VMs"
-      }
+        "description": "Create a forest? Use 'false' if you only want the Vault."
+      },
+      "defaultValue": true
     }
   },
   "variables": {
@@ -73,7 +70,6 @@
     "childdc1": "child-dc1",
     "childdc2": "child-dc2",
     "VMSize": "Standard_D1_v2",
-    "storageAccountType": "Standard_LRS",
     "createSecondDc": "yes",
 
     "skuTier": "standard",
@@ -100,7 +96,7 @@
   "resources": [
     {
       "type": "Microsoft.RecoveryServices/vaults",
-      "apiVersion": "2015-11-10",
+      "apiVersion": "2018-01-10",
       "name": "[parameters('vaultName')]",
       "location": "[resourceGroup().location]",
       "sku": {
@@ -111,7 +107,7 @@
       }
     },
     {
-      "apiVersion": "2015-11-10",
+      "apiVersion": "2018-08-01",
       "name": "[concat(parameters('vaultName'), '/', variables('policyName'))]",
       "type": "Microsoft.RecoveryServices/vaults/backupPolicies",
       "dependsOn": [
@@ -145,14 +141,15 @@
     {
       "name": "DeployForest",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
+      "apiVersion": "2018-08-01",
+      "condition": "[parameters('createForest')]",
       "dependsOn": [
         "[concat('Microsoft.RecoveryServices/vaults', '/', parameters('vaultName'), '/backupPolicies/', variables('policyName'))]"
       ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', parameters('DeployForestTemplateFolder'), '/', parameters('DeployForestTemplateFileName'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', parameters('DeployForestTemplateFolder'), '/', 'azuredeploy.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -170,9 +167,6 @@
           },
           "imageSKU": {
             "value": "[parameters('imageSKU')]"
-          },
-          "storageAccountType": {
-            "value": "[variables('storageAccountType')]"
           },
           "VMSize": {
             "value": "[variables('VMSize')]"
@@ -197,7 +191,7 @@
     },
     {
       "name": "[concat(variables('existingRecoveryServicesVaultName'), '/', variables('backupFabric'), '/', variables('existingProtectionContainers')[copyIndex()], '/', variables('existingProtectableItems')[copyIndex()])]",
-      "apiVersion": "2016-06-01",
+      "apiVersion": "2018-01-10",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.RecoveryServices/vaults', '/', parameters('vaultName'), '/backupPolicies/', variables('policyName'))]",
