@@ -44,14 +44,14 @@
     },
     "DeployForestTemplateFolder": {
       "type": "string",
-      "defaultValue": "master",
+      "defaultValue": "2.0-stable",
       "allowedValues": [
         "master",
         "1.0-stable",
         "2.0-stable"
       ],
       "metadata": {
-        "description": "Template location for the Forest. Use this to select a GITHUB branch. V1.0 is stable, master is current."
+        "description": "Template location for the Forest. Use this to select a GITHUB branch. V2.0 is stable, master is current."
       }
     },
     "createForest": {
@@ -69,7 +69,8 @@
     "rootdc2": "root-dc2",
     "childdc1": "child-dc1",
     "childdc2": "child-dc2",
-    "VMSize": "Standard_D1_v2",
+    "VMSize": "Standard_B1ms",
+    "diskSize": "StandardSSD_LRS",
     "createSecondDc": true,
     "createChildDomain": true,
 
@@ -175,6 +176,9 @@
           "VMSize": {
             "value": "[variables('VMSize')]"
           },
+          "diskType": {
+            "value": "[variables('diskSize')]"
+          }, 
           "createSecondDc": {
             "value": "[variables('createSecondDc')]"
           },
