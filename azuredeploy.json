@@ -53,13 +53,6 @@
       "metadata": {
         "description": "Template location for the Forest. Use this to select a GITHUB branch. V2.0 is stable, master is current."
       }
-    },
-    "createForest": {
-      "type": "bool",
-      "metadata": {
-        "description": "Create a forest? Use 'false' if you only want the Vault (forest must exist)"
-      },
-      "defaultValue": true
     }
   },
   "variables": {
@@ -73,6 +66,7 @@
     "diskSize": "Standard_LRS",
     "createSecondDc": true,
     "createChildDomain": true,
+    "createForest": true,
 
     "skuTier": "standard",
     "policyName": "dcBackup",
@@ -144,7 +138,7 @@
       "name": "DeployForest",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2018-08-01",
-      "condition": "[parameters('createForest')]",
+      "condition": "[variables('createForest')]",
       "dependsOn": [
         "[concat('Microsoft.RecoveryServices/vaults', '/', parameters('vaultName'), '/backupPolicies/', variables('policyName'))]"
       ],
