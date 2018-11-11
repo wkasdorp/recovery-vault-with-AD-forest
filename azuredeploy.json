@@ -72,6 +72,7 @@
     "policyName": "dcBackup",
     "scheduleRunDays": [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
     "scheduleRunTimes": [ "2018-01-01T22:00:00.000Z" ],
+    "timezone": "UTC",
     "dailyRetentionDurationCount": 60,
     "existingRecoveryServicesVaultName": "[parameters('vaultName')]",
     "existingProtectionContainers": [
@@ -111,6 +112,7 @@
       ],
       "location": "[resourceGroup().location]",
       "properties": {
+        "timeZone": "[variables('timeZone')]",
         "backupManagementType": "AzureIaasVM",
         "schedulePolicy": {
           "scheduleRunFrequency": "Daily",
