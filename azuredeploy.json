@@ -63,7 +63,7 @@
     "rootdc2": "root-dc2",
     "childdc1": "child-dc1",
     "childdc2": "child-dc2",
-    "VMSize": "Standard_A1_v2",
+    "VMSize": "Standard_D1_v2",
     "diskSize": "Standard_LRS",
     "createSecondDc": true,
     "createChildDomain": true,
